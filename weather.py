@@ -24,7 +24,7 @@ def codToDescripnion(cod):
     return DESK[cod//100]
     
     
-def get_weather(city_name,API_key):    
+def get_weather(city_name,API_key=WEA_KEY):    
     st =f'http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={API_key}&units=Metric'    
     try:        
         data = requests.get(st).json()
@@ -43,5 +43,32 @@ def get_weather(city_name,API_key):
         #f'В городе {city} сегодня {temp}*С , {desk}'
     else:
         return f'город не найден'
+    
+    
+def get_weather_coord(lat,lon,API_key=WEA_KEY):    
+    st =f'http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API_key}&units=Metric' 
+    print(st)
+    try:        
+        data = requests.get(st).json()
+    except Exception as e: 
+        print("ERR",e)
+    pprint(data)
+    if data["cod"]==200: 
+        '''
+        city = data["name"]
+        temp = data["main"]["temp"]
+        desk = data["weather"][0]["description"]
+        print("RESP",city,temp,desk)
+        '''
+        cardinal = degToCompass(data["wind"]["deg"])
+        description = codToDescripnion(int(data["weather"][0]["id"]))
+        return f'Сейчас в <b>{time.strftime("%H.%M",time.localtime())}</b>, температура <b>{data["main"]["temp"]}°С</b> , влажность {data["main"]["humidity"]}, ветер {cardinal} скорость {data["wind"]["speed"]} м/с, {description}'
+        #{} Сейчас в {время} в городе {город} температура {}°С , влажность {}, ветер {град} {ветер} м/с, {codToDescripnion({})}
+       
+    else:
+        return f'город не найден'    
+    
+    
 if __name__ == "__main__":
-    print(get_weather("Barnaul",WEA_KEY)) 
+    #print(get_weather("Barnaul",WEA_KEY)) 
+    print(get_weather_coord(lat=66.396693, lon=77.16208)) 

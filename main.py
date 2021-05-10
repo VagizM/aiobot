@@ -3,7 +3,7 @@ from aiogram import Bot,types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
-from weather import get_weather
+from weather import get_weather, get_weather_coord
 from course import get_cours
 
 bot = Bot(token=TG_KEY)
@@ -33,10 +33,14 @@ async def start_command(message: types.Message):
         
 @dp.message_handler(content_types=['location'])
 async def handle_loc(message):
+    
     print(message.location)
-    await message.reply("OK", parse_mode=types.ParseMode.HTML)
+    print(message.location["latitude"])
+    print(message.location["longitude"])    
+    r = get_weather_coord(lat=message.location["latitude"], lon=message.location["longitude"]) 
+    await message.reply(r, parse_mode=types.ParseMode.HTML)
 '''прилетело то что надо:
-{'longitude': xx.xxxxxx, 'latitude': yy.yyyyyy}
+{"latitude": 66.396693, "longitude": 77.16208}
 '''
 @dp.message_handler(commands=["c"])
 async def start_command(message: types.Message):
