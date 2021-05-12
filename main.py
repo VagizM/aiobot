@@ -5,6 +5,8 @@ from aiogram.utils import executor
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from weather import get_weather, get_weather_coord
 from course import get_cours
+import datetime
+import os
 
 bot = Bot(token=TG_KEY)
 dp = Dispatcher(bot)
@@ -53,22 +55,24 @@ async def start_command(message: types.Message):
         greet_kb.add(button_eu)
         await message.reply("введите команду  /c валюта", reply_markup=greet_kb) 
     else:
-        await message.reply(get_cours(mes[1]))     
-   
-
-
-            
+        await message.reply(get_cours(mes[1])) 
+        
 @dp.message_handler(content_types=[types.ContentType.PHOTO])
-async def process_photo_command(message: types.Message):
-    '''print("photo")
+async def process_photo_command(message: types.Message):   
+    if message["caption"] == None: 
+        s=""
+    else:      
+        
+        s = "".join(filter(str.isalpha, message["caption"]))
+   
+    f_name = f'{datetime.datetime.now().strftime("%y_%m_%d_%H_%M_%S")}__{message["photo"][0]["file_unique_id"]} {s} .jpg'
+    p_name = f'photo_{message["from"]["first_name"]}'
     print(message)
-    print(message.content_type)
-    print(message.text)        
+    if not (os.path.exists(p_name)):
+        os.mkdir(p_name)
+    await message.photo[-1].download(f'{p_name}/{f_name}') 
     await message.reply("Media") 
-    # Убедитесь, что каталог /tmp/somedir существует!
-    await message.photo[-1].download(destination="/tmp/somedir/")'''
-    await message.photo[-1].download('test.jpg')
-
+    
 @dp.message_handler()    
 async def echo_message(message: types.Message):       
     print("ALL")   
